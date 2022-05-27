@@ -6,6 +6,7 @@ use MixPanel\ConsumerStrategies\FileConsumer;
 use MixPanel\ConsumerStrategies\SocketConsumer;
 use MixPanel\Base\MixPanelBase;
 use MixPanel\ConsumerStrategies\CurlConsumer;
+use MixPanel\ConsumerStrategies\GuzzleConsumer;
 
 /**
  * Provides some base methods for use by a message Producer
@@ -36,6 +37,7 @@ abstract class MixPanelBaseProducer extends MixPanelBase
         "file" =>  FileConsumer::class,
         "curl" =>  CurlConsumer::class,
         "socket" =>  SocketConsumer::class,
+        "guzzle" => GuzzleConsumer::class,
     );
 
 

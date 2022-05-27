@@ -15,7 +15,7 @@
     "require": {
         "php": "^7.2.5 || ^8.0",
         "ext-json": "*",
-        "guzzlehttp/promises": "^1.5",
+        "guzzlehttp/guzzle": "^7.0.1",
         "psr/log": "^1.1 || ^2.0 || ^3.0",
         "illuminate/support": "^5.2|^6.0|^7.0|^8.0",
         "nesbot/carbon": "^2.53.1"
