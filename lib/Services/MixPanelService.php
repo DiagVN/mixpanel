@@ -9,24 +9,17 @@ use MixPanel\Producers\MixPanelPeople;
 class MixPanelService extends MixPanelBase
 {
     /**
-     * An instance of the MixpanelPeople class (used to create/update profiles)
+     * An instance of the MixPanelPeople class (used to create/update profiles)
      * @var MixPanelPeople
      */
     public $people;
 
 
     /**
-     * An instance of the MixpanelEvents class
-     * @var Producers_MixpanelEvents
+     * An instance of the MixPanelEvents class
+     * @var MixPanelEvents
      */
     private $events;
-
-
-    /**
-     * Instances' list of the Mixpanel class (for singleton use, splitted by token)
-     * @var Mixpanel[]
-     */
-    private static $_instances = array();
 
 
     /**
@@ -34,11 +27,9 @@ class MixPanelService extends MixPanelBase
      * @param $token
      * @param array $options
      */
-    public function __construct($token, $options = array())
+    public function __construct($options = array())
     {
         parent::__construct($options);
-        $this->people = new MixPanelPeople($token, $options);
-        $this->events = new MixPanelEvents($token, $options);
     }
 
     /**
@@ -63,11 +54,11 @@ class MixPanelService extends MixPanelBase
 
     /**
      * Flush the events queue
-     * @param int $desired_batch_size
+     * @param int $desiredBatchSize
      */
-    public function flush($desired_batch_size = 50)
+    public function flush($desiredBatchSize = 50)
     {
-        $this->_events->flush($desired_batch_size);
+        $this->_events->flush($desiredBatchSize);
     }
 
 
@@ -122,11 +113,11 @@ class MixPanelService extends MixPanelBase
      * If any of the properties have already been registered,
      * they will be overwritten. NOTE: Registered properties are only persisted for the life of the Mixpanel class
      * instance.
-     * @param array $props_and_vals
+     * @param array $propsAndVals
      */
-    public function registerAll($props_and_vals = array())
+    public function registerAll($propsAndVals = array())
     {
-        $this->events->registerAll($props_and_vals);
+        $this->events->registerAll($propsAndVals);
     }
 
 
@@ -150,11 +141,11 @@ class MixPanelService extends MixPanelBase
      * If any of the properties have already been registered,
      * they will NOT be overwritten. NOTE: Registered properties are only persisted for the life of the Mixpanel class
      * instance.
-     * @param array $props_and_vals
+     * @param array $propsAndVals
      */
-    public function registerAllOnce($props_and_vals = array())
+    public function registerAllOnce($propsAndVals = array())
     {
-        $this->events->registerAllOnce($props_and_vals);
+        $this->events->registerAllOnce($propsAndVals);
     }
 
 
@@ -198,5 +189,15 @@ class MixPanelService extends MixPanelBase
     public function createAlias($distinct_id, $alias)
     {
         $this->events->createAlias($distinct_id, $alias);
+    }
+
+    /***
+     * Custom function to set token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+        $this->people = new MixPanelPeople($token, $this->options);
+        $this->events = new MixPanelEvents($token, $this->options);
     }
 }

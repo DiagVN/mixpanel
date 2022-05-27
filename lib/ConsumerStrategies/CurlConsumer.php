@@ -48,7 +48,7 @@ class CurlConsumer extends AbstractConsumer
     /**
      * @var int number of cURL requests to run in parallel. 1 by default
      */
-    protected $num_threads;
+    protected $numThreads;
 
 
     /**
@@ -66,7 +66,7 @@ class CurlConsumer extends AbstractConsumer
         $this->timeout = array_key_exists('timeout', $options) ? $options['timeout'] : 30;
         $this->protocol = array_key_exists('use_ssl', $options) && $options['use_ssl'] == true ? "https" : "http";
         $this->fork = array_key_exists('fork', $options) ? ($options['fork'] == true) : false;
-        $this->num_threads = array_key_exists('num_threads', $options) ? max(1, intval($options['num_threads'])) : 1;
+        $this->numThreads = array_key_exists('num_threads', $options) ? max(1, intval($options['num_threads'])) : 1;
 
         // ensure the environment is workable for the given settings
         if ($this->fork == true) {
@@ -123,8 +123,8 @@ class CurlConsumer extends AbstractConsumer
         $mh = curl_multi_init();
         $chs = array();
 
-        $batch_size = ceil(count($batch) / $this->num_threads);
-        for ($i = 0; $i < $this->num_threads && !empty($batch); $i++) {
+        $batch_size = ceil(count($batch) / $this->getNumThreads());
+        for ($i = 0; $i < $this->getNumThreads() && !empty($batch); $i++) {
             $ch = curl_init();
             $chs[] = $ch;
             $data = "data=" . $this->_encode(array_splice($batch, 0, $batch_size));
@@ -259,6 +259,6 @@ class CurlConsumer extends AbstractConsumer
      */
     public function getNumThreads()
     {
-        return $this->num_threads;
+        return $this->numThreads;
     }
 }

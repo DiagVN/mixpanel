@@ -17,7 +17,6 @@ class MixPanelEvents extends MixPanelBaseProducer
      */
     private $superProperties = array("mp_lib" => "php");
 
-
     /**
      * Track an event defined by $event associated with metadata defined by $properties
      * @param string $event
@@ -33,7 +32,7 @@ class MixPanelEvents extends MixPanelBaseProducer
 
         // if no time is passed in, use the current time
         if (!array_key_exists('time', $properties)) {
-            $properties['time'] = Carbon::now(config('mixpanel.timezone'))->timestamp;
+            $properties['time'] = config('mixpanel.timezone') ? Carbon::now(config('mixpanel.timezone'))->timestamp : time();
         }
 
         $params['event'] = $event;
@@ -58,11 +57,11 @@ class MixPanelEvents extends MixPanelBaseProducer
     /**
      * Register multiple properties to be sent with every event. If any of the properties have already been registered,
      * they will be overwritten.
-     * @param array $props_and_vals
+     * @param array $propsAndVals
      */
-    public function registerAll($props_and_vals = array())
+    public function registerAll($propsAndVals = array())
     {
-        foreach ($props_and_vals as $property => $value) {
+        foreach ($propsAndVals as $property => $value) {
             $this->register($property, $value);
         }
     }
@@ -85,11 +84,11 @@ class MixPanelEvents extends MixPanelBaseProducer
     /**
      * Register multiple properties to be sent with every event. If any of the properties have already been registered,
      * they will NOT be overwritten.
-     * @param array $props_and_vals
+     * @param array $propsAndVals
      */
-    public function registerAllOnce($props_and_vals = array())
+    public function registerAllOnce($propsAndVals = array())
     {
-        foreach ($props_and_vals as $property => $value) {
+        foreach ($propsAndVals as $property => $value) {
             if (!isset($this->superProperties[$property])) {
                 $this->register($property, $value);
             }
@@ -136,19 +135,19 @@ class MixPanelEvents extends MixPanelBaseProducer
      * @param string|int $user_id
      * @param string|int $anon_id [optional]
      */
-    public function identify($user_id, $anon_id = null)
+    public function identify($userId, $anonId = null)
     {
-        $this->register("distinct_id", $user_id);
+        $this->register("distinct_id", $userId);
 
         $UUIDv4 = '/^[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]*-[a-zA-Z0-9]*$/i';
-        if (!empty($anon_id)) {
-            if (preg_match($UUIDv4, $anon_id) !== 1) {
+        if (!empty($anonId)) {
+            if (preg_match($UUIDv4, $anonId) !== 1) {
                 /* not a valid uuid */
-                $this->log("Running Identify method (identified_id: $user_id, anon_id: $anon_id) failed, anon_id not in UUID v4 format");
+                $this->log("Running Identify method (identified_id: $userId, anon_id: $anonId) failed, anon_id not in UUID v4 format");
             } else {
                 $this->track('$identify', array(
-                    '$identified_id' => $user_id,
-                    '$anon_id'       => $anon_id
+                    '$identified_id' => $userId,
+                    '$anon_id'       => $anonId
                 ));
             }
         }
@@ -167,11 +166,15 @@ class MixPanelEvents extends MixPanelBaseProducer
      * @return array $msg
      * @throws Exception
      */
-    public function createAlias($distinct_id, $alias)
+    public function createAlias($distinctId, $alias)
     {
         $msg = array(
             "event"  => '$create_alias',
-            "properties" =>  array("distinct_id" => $distinct_id, "alias" => $alias, "token" => $this->token)
+            "properties" =>  array(
+                "distinct_id" => $distinctId,
+                "alias" => $alias,
+                "token" => $this->token
+            )
         );
 
         // Save the current fork/async options
@@ -191,7 +194,7 @@ class MixPanelEvents extends MixPanelBaseProducer
         $this->options['async'] = $oldasync;
 
         if (!$success) {
-            $this->log("Creating Mixpanel Alias (distinct id: $distinct_id, alias: $alias) failed");
+            $this->log("Creating Mixpanel Alias (distinct id: $distinctId, alias: $alias) failed");
             throw new Exception("Tried to create an alias but the call was not successful");
         } else {
             return $msg;

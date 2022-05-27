@@ -52,7 +52,7 @@ class GuzzleConsumer extends AbstractConsumer
     /**
      * @var int number of cURL requests to run in parallel. 1 by default
      */
-    protected $num_threads;
+    protected $numThreads;
 
 
     /**
@@ -70,7 +70,7 @@ class GuzzleConsumer extends AbstractConsumer
         $this->timeout = array_key_exists('timeout', $options) ? $options['timeout'] : 30;
         $this->protocol = array_key_exists('use_ssl', $options) && $options['use_ssl'] == true ? "https" : "http";
         $this->fork = array_key_exists('fork', $options) ? ($options['fork'] == true) : false;
-        $this->num_threads = array_key_exists('num_threads', $options) ? max(1, intval($options['num_threads'])) : 1;
+        $this->numThreads = array_key_exists('num_threads', $options) ? max(1, intval($options['num_threads'])) : 1;
     }
 
 
@@ -108,8 +108,8 @@ class GuzzleConsumer extends AbstractConsumer
             'http_errors' => config('mixpanel.ignore_http_errors')
         ]);
         $promises = [];
-        $batch_size = ceil(count($batch) / $this->num_threads);
-        for ($i = 0; $i < $this->num_threads && !empty($batch); $i++) {
+        $batch_size = ceil(count($batch) / $this->getNumThreads());
+        for ($i = 0; $i < $this->getNumThreads() && !empty($batch); $i++) {
             $promises[] = $client->postAsync($url, [
                 'form_params' => [
                     'data' => $this->_encode(array_splice($batch, 0, $batch_size))
@@ -226,6 +226,6 @@ class GuzzleConsumer extends AbstractConsumer
      */
     public function getNumThreads()
     {
-        return $this->num_threads;
+        return $this->numThreads;
     }
 }

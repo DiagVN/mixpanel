@@ -17,20 +17,20 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found
      * @return array
      */
-    private function _constructPayload($distinct_id, $operation, $value, $ip = null, $ignore_time = false, $ignore_alias = false)
+    private function _constructPayload($distinctId, $operation, $value, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
         $payload = array(
             '$token' => $this->token,
-            '$distinct_id' => $distinct_id,
+            '$distinct_id' => $distinctId,
             $operation => $value
         );
         if ($ip !== null) {
             $payload['$ip'] = $ip;
         }
-        if ($ignore_time === true) {
+        if ($ignoreTime === true) {
             $payload['$ignore_time'] = true;
         }
-        if ($ignore_alias === true) {
+        if ($ignoreAlias === true) {
             $payload['$ignore_alias'] = true;
         }
         return $payload;
@@ -45,9 +45,9 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_time If the $ignore_time property is true, Mixpanel will not automatically update the "Last Seen" property of the profile. Otherwise, Mixpanel will add a "Last Seen" property associated with the current time
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found
      */
-    public function set($distinct_id, $props, $ip = null, $ignore_time = false, $ignore_alias = false)
+    public function set($distinctId, $props, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
-        $payload = $this->_constructPayload($distinct_id, '$set', $props, $ip, $ignore_time, $ignore_alias);
+        $payload = $this->_constructPayload($distinctId, '$set', $props, $ip, $ignoreTime, $ignoreAlias);
         $this->enqueue($payload);
     }
 
@@ -60,9 +60,9 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_time If the $ignore_time property is true, Mixpanel will not automatically update the "Last Seen" property of the profile. Otherwise, Mixpanel will add a "Last Seen" property associated with the current time
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found     
      */
-    public function setOnce($distinct_id, $props, $ip = null, $ignore_time = false, $ignore_alias = false)
+    public function setOnce($distinctId, $props, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
-        $payload = $this->_constructPayload($distinct_id, '$set_once', $props, $ip, $ignore_time, $ignore_alias);
+        $payload = $this->_constructPayload($distinctId, '$set_once', $props, $ip, $ignoreTime, $ignoreAlias);
         $this->enqueue($payload);
     }
 
@@ -76,9 +76,9 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_time If the $ignore_time property is true, Mixpanel will not automatically update the "Last Seen" property of the profile. Otherwise, Mixpanel will add a "Last Seen" property associated with the current time
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found     
      */
-    public function remove($distinct_id, $props, $ip = null, $ignore_time = false, $ignore_alias = false)
+    public function remove($distinctId, $props, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
-        $payload = $this->_constructPayload($distinct_id, '$unset', $props, $ip, $ignore_time, $ignore_alias);
+        $payload = $this->_constructPayload($distinctId, '$unset', $props, $ip, $ignoreTime, $ignoreAlias);
         $this->enqueue($payload);
     }
 
@@ -92,9 +92,9 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_time If the $ignore_time property is true, Mixpanel will not automatically update the "Last Seen" property of the profile. Otherwise, Mixpanel will add a "Last Seen" property associated with the current time
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found     
      */
-    public function increment($distinct_id, $prop, $val, $ip = null, $ignore_time = false, $ignore_alias = false)
+    public function increment($distinctId, $prop, $val, $ip = null, $ignoreTime = false, $ignore_alias = false)
     {
-        $payload = $this->_constructPayload($distinct_id, '$add', array("$prop" => $val), $ip, $ignore_time, $ignore_alias);
+        $payload = $this->_constructPayload($distinctId, '$add', array("$prop" => $val), $ip, $ignoreTime, $ignore_alias);
         $this->enqueue($payload);
     }
 
@@ -108,10 +108,10 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_time If the $ignore_time property is true, Mixpanel will not automatically update the "Last Seen" property of the profile. Otherwise, Mixpanel will add a "Last Seen" property associated with the current time
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found     
      */
-    public function append($distinct_id, $prop, $val, $ip = null, $ignore_time = false, $ignore_alias = false)
+    public function append($distinctId, $prop, $val, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
         $operation = gettype($val) == "array" ? '$union' : '$append';
-        $payload = $this->_constructPayload($distinct_id, $operation, array("$prop" => $val), $ip, $ignore_time, $ignore_alias);
+        $payload = $this->_constructPayload($distinctId, $operation, array("$prop" => $val), $ip, $ignoreTime, $ignoreAlias);
         $this->enqueue($payload);
     }
 
@@ -124,7 +124,7 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_time If the $ignore_time property is true, Mixpanel will not automatically update the "Last Seen" property of the profile. Otherwise, Mixpanel will add a "Last Seen" property associated with the current time
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found     
      */
-    public function trackCharge($distinct_id, $amount, $timestamp = null, $ip = null, $ignore_time = false, $ignore_alias = false)
+    public function trackCharge($distinctId, $amount, $timestamp = null, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
         $timestamp = $timestamp == null ? time() : $timestamp;
         $date_iso = date("c", $timestamp);
@@ -133,7 +133,7 @@ class MixPanelPeople extends MixPanelBaseProducer
             '$amount' => $amount
         );
         $val = array('$transactions' => $transaction);
-        $payload = $this->_constructPayload($distinct_id, '$append', $val, $ip, $ignore_time, $ignore_alias);
+        $payload = $this->_constructPayload($distinctId, '$append', $val, $ip, $ignoreTime, $ignoreAlias);
         $this->enqueue($payload);
     }
 
@@ -144,9 +144,9 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_time If the $ignore_time property is true, Mixpanel will not automatically update the "Last Seen" property of the profile. Otherwise, Mixpanel will add a "Last Seen" property associated with the current time
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found     
      */
-    public function clearCharges($distinct_id, $ip = null, $ignore_time = false, $ignore_alias = false)
+    public function clearCharges($distinctId, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
-        $payload = $this->_constructPayload($distinct_id, '$set', array('$transactions' => array()), $ip, $ignore_time, $ignore_alias);
+        $payload = $this->_constructPayload($distinctId, '$set', array('$transactions' => array()), $ip, $ignoreTime, $ignoreAlias);
         $this->enqueue($payload);
     }
 
@@ -157,9 +157,9 @@ class MixPanelPeople extends MixPanelBaseProducer
      * @param boolean $ignore_time If the $ignore_time property is true, Mixpanel will not automatically update the "Last Seen" property of the profile. Otherwise, Mixpanel will add a "Last Seen" property associated with the current time
      * @param boolean $ignore_alias If the $ignore_alias property is true, an alias look up will not be performed after ingestion. Otherwise, a lookup for the distinct ID will be performed, and replaced if a match is found     
      */
-    public function deleteUser($distinct_id, $ip = null, $ignore_time = false, $ignore_alias = false)
+    public function deleteUser($distinctId, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
-        $payload = $this->_constructPayload($distinct_id, '$delete', "", $ip, $ignore_time, $ignore_alias);
+        $payload = $this->_constructPayload($distinctId, '$delete', "", $ip, $ignoreTime, $ignoreAlias);
         $this->enqueue($payload);
     }
 

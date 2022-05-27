@@ -24,6 +24,12 @@ class MixPanelBase
      */
     protected $options = array();
 
+    /**
+     * An array of options to be used by the Mixpanel library.
+     * @var array
+     */
+    protected $token;
+
 
     /**
      * @var LoggerInterface

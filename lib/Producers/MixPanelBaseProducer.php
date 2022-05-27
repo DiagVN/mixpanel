@@ -103,21 +103,21 @@ abstract class MixPanelBaseProducer extends MixPanelBase
 
     /**
      * Iterate the queue and write in batches using the instantiated Consumer Strategy
-     * @param int $desired_batch_size
+     * @param int $desiredBatchSize
      * @return bool whether or not the flush was successful
      */
-    public function flush($desired_batch_size = 50)
+    public function flush($desiredBatchSize = 50)
     {
         $queue_size = count($this->queue);
         $succeeded = true;
-        $num_threads = $this->consumer->getNumThreads();
+        $numThreads = $this->consumer->getNumThreads();
 
         if ($this->debug()) {
             $this->log("Flush called - queue size: " . $queue_size);
         }
 
         while ($queue_size > 0 && $succeeded) {
-            $batch_size = min(array($queue_size, $desired_batch_size * $num_threads, $this->options['max_batch_size'] * $num_threads));
+            $batch_size = min(array($queue_size, $desiredBatchSize * $numThreads, $this->options['max_batch_size'] * $numThreads));
             $batch = array_splice($this->queue, 0, $batch_size);
             $succeeded = $this->_persist($batch);
 
