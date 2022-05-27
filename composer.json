@@ -33,9 +33,11 @@
             "MixPanel\\": "lib/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "MixPanel\\Tests\\": "tests/"
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MixPanel\\Providers\\MixPanelProvider"
+            ]
         }
     }
 }
