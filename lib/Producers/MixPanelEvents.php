@@ -2,6 +2,8 @@
 
 namespace MixPanel\Producers;
 
+use Carbon\Carbon;
+
 use Exception;
 
 /**
@@ -31,7 +33,7 @@ class MixPanelEvents extends MixPanelBaseProducer
 
         // if no time is passed in, use the current time
         if (!array_key_exists('time', $properties)) {
-            $properties['time'] = time();
+            $properties['time'] = Carbon::now(config('mixpanel.timezone'))->timestamp;
         }
 
         $params['event'] = $event;

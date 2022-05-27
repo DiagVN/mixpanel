@@ -14,7 +14,7 @@ class MixPanelProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__ . '/lib/Config/mixpanel.php' => config_path('mixpanel.php'),
+            dirname(__FILE__) . '/../Config/mixpanel.php' => config_path('mixpanel.php'),
         ]);
     }
 

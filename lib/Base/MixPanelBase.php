@@ -2,6 +2,8 @@
 
 namespace MixPanel\Base;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * This a Base class which all Mixpanel classes extend from to provide some very basic
  * debugging and logging functionality. It also serves to persist $options across the library.
@@ -24,11 +26,18 @@ class MixPanelBase
 
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Construct a new MixPanelBase object and merge custom options with defaults
      * @param array $options
      */
-    public function __construct($options = array())
-    {
+    public function __construct(
+        $options = array(),
+        LoggerInterface $logger = null
+    ) {
         $this->defaults = config('mixpanel');
         $options = array_merge($this->defaults, $options);
         $this->options = $options;

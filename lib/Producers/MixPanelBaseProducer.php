@@ -5,8 +5,7 @@ namespace MixPanel\Producers;
 use MixPanel\ConsumerStrategies\FileConsumer;
 use MixPanel\ConsumerStrategies\SocketConsumer;
 use MixPanel\Base\MixPanelBase;
-use Psr\Log\LoggerInterface;
-
+use MixPanel\ConsumerStrategies\CurlConsumer;
 /**
  * Provides some base methods for use by a message Producer
  */
@@ -26,18 +25,13 @@ abstract class MixPanelBaseProducer extends MixPanelBase
     /**
      * @var AbstractConsumer the consumer to use when flushing messages
      */
-    private $_consumer = null;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private $consumer = null;
 
 
     /**
      * @var array The list of available consumers
      */
-    private $_consumers = array(
+    private $consumers = array(
         "file" =>  FileConsumer::class,
         "curl" =>  CurlConsumer::class,
         "socket" =>  SocketConsumer::class,
@@ -59,19 +53,18 @@ abstract class MixPanelBaseProducer extends MixPanelBase
      */
     public function __construct(
         $token,
-        $options = array(),
-        LoggerInterface $logger = null
+        $options = array()
     ) {
 
         parent::__construct($options);
 
         // register any customer consumers
-        if (array_key_exists("consumers", $options)) {
-            $this->_consumers = array_merge($this->_consumers, $options['consumers']);
+        if (array_key_exists("consumers", $this->options)) {
+            $this->consumers = array_merge($this->consumers $this->options['consumers']);
         }
 
         // set max queue size
-        if (array_key_exists("max_queue_size", $options)) {
+        if (array_key_exists("max_queue_size", $this->options)) {
             $this->maxQueueSize = $options['max_queue_size'];
         }
 
@@ -83,7 +76,7 @@ abstract class MixPanelBaseProducer extends MixPanelBase
         }
 
         // instantiate the chosen consumer
-        $this->_consumer = $this->getConsumer();
+        $this->consumer = $this->getConsumer();
 
         $this->logger = $logger;
     }
@@ -116,7 +109,7 @@ abstract class MixPanelBaseProducer extends MixPanelBase
     {
         $queue_size = count($this->queue);
         $succeeded = true;
-        $num_threads = $this->_consumer->getNumThreads();
+        $num_threads = $this->consumer->getNumThreads();
 
         if ($this->debug()) {
             $this->log("Flush called - queue size: " . $queue_size);
@@ -183,7 +176,7 @@ abstract class MixPanelBaseProducer extends MixPanelBase
     protected function getConsumer()
     {
         $key = $this->options['consumer'];
-        $Strategy = $this->_consumers[$key];
+        $Strategy = $this->consumers[$key];
         if ($this->debug()) {
             $this->log("Using consumer: " . $key . " -> " . $Strategy);
         }
@@ -231,7 +224,7 @@ abstract class MixPanelBaseProducer extends MixPanelBase
      */
     protected function _persist($message)
     {
-        return $this->_consumer->persist($message);
+        return $this->consumer->persist($message);
     }
 
 
