@@ -194,7 +194,7 @@ abstract class MixPanelBaseProducer extends MixPanelBase
         array_push($this->queue, $message);
 
         // force a flush if we've reached our threshold
-        if (count($this->queue) > $this->maxQueueSize) {
+        if (count($this->queue) >= $this->maxQueueSize) {
             $this->flush();
         }
 
