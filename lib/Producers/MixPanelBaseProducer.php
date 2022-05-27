@@ -186,7 +186,6 @@ abstract class MixPanelBaseProducer extends MixPanelBase
         return new $Strategy($this->options);
     }
 
-
     /**
      * Add an array representing a message to be sent to Mixpanel to a queue.
      * @param array $message
@@ -227,9 +226,6 @@ abstract class MixPanelBaseProducer extends MixPanelBase
     {
         return $this->consumer->persist($message);
     }
-
-
-
 
     /**
      * Return the endpoint that should be used by a consumer that consumes messages produced by this producer.

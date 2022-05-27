@@ -21,17 +21,6 @@ class MixPanelService extends MixPanelBase
      */
     private $events;
 
-
-    /**
-     * Instantiates a new Mixpanel instance.
-     * @param $token
-     * @param array $options
-     */
-    public function __construct($options = array())
-    {
-        parent::__construct($options);
-    }
-
     /**
      * Add an array representing a message to be sent to Mixpanel to the in-memory queue.
      * @param array $message
@@ -58,7 +47,7 @@ class MixPanelService extends MixPanelBase
      */
     public function flush($desiredBatchSize = 50)
     {
-        $this->_events->flush($desiredBatchSize);
+        $this->events->flush($desiredBatchSize);
     }
 
 
@@ -77,9 +66,9 @@ class MixPanelService extends MixPanelBase
      * @param string|int $user_id
      * @param string|int $anon_id [optional]
      */
-    public function identify($user_id, $anon_id = null)
+    public function identify($userId, $anonId = null)
     {
-        $this->events->identify($user_id, $anon_id);
+        $this->events->identify($userId, $anonId);
     }
 
     /**
@@ -131,7 +120,7 @@ class MixPanelService extends MixPanelBase
      */
     public function registerOnce($property, $value)
     {
-        $this->_events->registerOnce($property, $value);
+        $this->events->registerOnce($property, $value);
     }
 
 
@@ -186,9 +175,9 @@ class MixPanelService extends MixPanelBase
      * @param string|int $distinct_id
      * @param string|int $alias
      */
-    public function createAlias($distinct_id, $alias)
+    public function createAlias($distinctId, $alias)
     {
-        $this->events->createAlias($distinct_id, $alias);
+        $this->events->createAlias($distinctId, $alias);
     }
 
     /***
