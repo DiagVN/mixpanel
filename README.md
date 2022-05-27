@@ -4,12 +4,12 @@ This library provides an API to track events and update profiles on Mixpanel.
 
 ## Install with Composer
 
-Add diagvn/mixpanel-php as a dependency and run composer update
+Add diagvn/mixpanel as a dependency and run composer update
 
 ```json
 "require": {
     ...
-    "diagvn/mixpanel-php" : "1.*"
+    "diagvn/mixpanel" : "1.*"
     ...
 }
 ```
