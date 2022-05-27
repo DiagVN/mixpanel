@@ -3,8 +3,8 @@
 namespace MixPanel\Services;
 
 use MixPanel\Base\MixPanelBase;
-use MixPanel\Base\Producers\MixPanelEvents;
-use MixPanel\Base\Producers\MixPanelPeople;
+use MixPanel\Producers\MixPanelEvents;
+use MixPanel\Producers\MixPanelPeople;
 
 class MixPanelService extends MixPanelBase
 {

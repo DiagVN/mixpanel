@@ -1,6 +1,6 @@
 <?php
 
-namespace MixPanel\Base\ConsumerStrategies;
+namespace MixPanel\ConsumerStrategies;
 
 use Exception;
 

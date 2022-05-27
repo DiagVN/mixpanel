@@ -1,9 +1,9 @@
 <?php
 
-namespace MixPanel\Base\Producers;
+namespace MixPanel\Producers;
 
-use MixPanel\Base\ConsumerStrategies\FileConsumer;
-use MixPanel\Base\ConsumerStrategies\SocketConsumer;
+use MixPanel\ConsumerStrategies\FileConsumer;
+use MixPanel\ConsumerStrategies\SocketConsumer;
 use MixPanel\Base\MixPanelBase;
 use Psr\Log\LoggerInterface;
 
@@ -38,9 +38,9 @@ abstract class MixPanelBaseProducer extends MixPanelBase
      * @var array The list of available consumers
      */
     private $_consumers = array(
-        "file"      =>  FileConsumer::class,
-        "curl"      =>  CurlConsumer::class,
-        "socket"    =>  SocketConsumer::class,
+        "file" =>  FileConsumer::class,
+        "curl" =>  CurlConsumer::class,
+        "socket" =>  SocketConsumer::class,
     );
 
 

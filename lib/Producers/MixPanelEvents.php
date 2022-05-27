@@ -1,9 +1,8 @@
 <?php
 
-namespace MixPanel\Base\Producers;
+namespace MixPanel\Producers;
 
 use Exception;
-use MixPanel\Base\Producers\MixPanelBaseProducer;
 
 /**
  * Provides an API to track events on Mixpanel

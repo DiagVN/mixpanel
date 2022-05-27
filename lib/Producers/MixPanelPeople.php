@@ -1,6 +1,6 @@
 <?php
 
-namespace MixPanel\Base\Producers;
+namespace MixPanel\Producers;
 
 /**
  * Provides an API to create/update profiles on Mixpanel

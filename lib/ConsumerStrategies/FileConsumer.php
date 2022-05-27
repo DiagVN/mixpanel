@@ -1,6 +1,6 @@
 <?php
 
-namespace MixPanel\Base\ConsumerStrategies;
+namespace MixPanel\ConsumerStrategies;
 
 /**
  * Consumes messages and writes them to a file
