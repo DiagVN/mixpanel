@@ -6,6 +6,7 @@ use MixPanel\ConsumerStrategies\FileConsumer;
 use MixPanel\ConsumerStrategies\SocketConsumer;
 use MixPanel\Base\MixPanelBase;
 use MixPanel\ConsumerStrategies\CurlConsumer;
+
 /**
  * Provides some base methods for use by a message Producer
  */
@@ -60,12 +61,12 @@ abstract class MixPanelBaseProducer extends MixPanelBase
 
         // register any customer consumers
         if (array_key_exists("consumers", $this->options)) {
-            $this->consumers = array_merge($this->consumers $this->options['consumers']);
+            $this->consumers = array_merge($this->consumers, $this->options['consumers']);
         }
 
         // set max queue size
         if (array_key_exists("max_queue_size", $this->options)) {
-            $this->maxQueueSize = $options['max_queue_size'];
+            $this->maxQueueSize = $this->options['max_queue_size'];
         }
 
         // associate token
@@ -77,8 +78,6 @@ abstract class MixPanelBaseProducer extends MixPanelBase
 
         // instantiate the chosen consumer
         $this->consumer = $this->getConsumer();
-
-        $this->logger = $logger;
     }
 
 
