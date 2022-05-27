@@ -10,5 +10,6 @@ return [
     'use_ssl' => env('MIXPANEL_USE_SSL', true),
     "error_callback" => null,
     'timezone' => env('DEFAULT_DISPLAY_TIMEZONE', 'Asia/Ho_Chi_Minh'),
-    "ignore_http_errors" => env('MIXPANEL_IGNORE_HTTP_ERROR', false)
+    "ignore_http_errors" => env('MIXPANEL_IGNORE_HTTP_ERROR', false),
+    "debug" => env('MIXPANEL_DEBUG', false),
 ];

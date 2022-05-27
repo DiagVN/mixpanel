@@ -2,6 +2,9 @@
 
 namespace MixPanel\Base;
 
+use Carbon\Carbon;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -47,7 +50,12 @@ class MixPanelBase
         $this->defaults = config('mixpanel');
         $options = array_merge($this->defaults, $options);
         if (!$logger) {
-            $this->logger = app()->make(LoggerInterface::class);
+            $date = Carbon::now()->format('Y-m-d');
+            $this->logger = new Logger('MixPanel');
+            $this->logger->pushHandler(
+                new StreamHandler(storage_path('logs/mixpanel-' . $date . '.log')),
+                Logger::DEBUG
+            );;
         }
         $this->options = $options;
     }
@@ -62,7 +70,7 @@ class MixPanelBase
         $arr = debug_backtrace();
         $class = $arr[0]['class'];
         $line = $arr[0]['line'];
-        $this->logger->error("[ $class - line $line ] : " . $msg);
+        $this->logger->debug("[ $class - line $line ] : " . $msg);
     }
 
 
