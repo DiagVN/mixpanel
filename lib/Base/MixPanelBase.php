@@ -13,17 +13,7 @@ class MixPanelBase
      * Default options that can be overridden via the $options constructor arg
      * @var array
      */
-    private $_defaults = array(
-        "max_batch_size" => 50, // the max batch size Mixpanel will accept is 50,
-        "max_queue_size" => 1000, // the max num of items to hold in memory before flushing
-        "debug" => false, // enable/disable debug mode
-        "consumer" => "curl", // which consumer to use
-        "host" => "api.mixpanel.com", // the host name for api calls
-        "events_endpoint" => "/track", // host relative endpoint for events
-        "people_endpoint" => "/engage", // host relative endpoint for people updates
-        "use_ssl" => true, // use ssl when available
-        "error_callback" => null // callback to use on consumption failures
-    );
+    private $defaults = [];
 
 
     /**
@@ -39,7 +29,8 @@ class MixPanelBase
      */
     public function __construct($options = array())
     {
-        $options = array_merge($this->_defaults, $options);
+        $this->defaults = config('mixpanel');
+        $options = array_merge($this->defaults, $options);
         $this->options = $options;
     }
 
