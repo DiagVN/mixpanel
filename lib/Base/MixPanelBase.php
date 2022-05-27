@@ -41,7 +41,7 @@ class MixPanelBase
         $this->defaults = config('mixpanel');
         $options = array_merge($this->defaults, $options);
         if (!$logger) {
-            $this->logger = $this->app->make(LoggerInterface::class);
+            $this->logger = app()->make(LoggerInterface::class);
         }
         $this->options = $options;
     }
