@@ -2,6 +2,8 @@
 
 namespace MixPanel\Producers;
 
+use Carbon\Carbon;
+
 /**
  * Provides an API to create/update profiles on Mixpanel
  */
@@ -126,8 +128,8 @@ class MixPanelPeople extends MixPanelBaseProducer
      */
     public function trackCharge($distinctId, $amount, $timestamp = null, $ip = null, $ignoreTime = false, $ignoreAlias = false)
     {
-        $timestamp = $timestamp == null ? time() : $timestamp;
-        $date_iso = date("c", $timestamp);
+        $timestamp = $timestamp == null ? Carbon::now()->timestamp : $timestamp;
+        $date_iso = Carbon::parse($timestamp)->format('c');
         $transaction = array(
             '$time' => $date_iso,
             '$amount' => $amount
