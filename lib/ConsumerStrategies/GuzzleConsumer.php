@@ -71,6 +71,7 @@ class GuzzleConsumer extends AbstractConsumer
         $this->protocol = array_key_exists('use_ssl', $options) && $options['use_ssl'] == true ? "https" : "http";
         $this->fork = array_key_exists('fork', $options) ? ($options['fork'] == true) : false;
         $this->numThreads = array_key_exists('num_threads', $options) ? max(1, intval($options['num_threads'])) : 1;
+        $this->import = array_key_exists('import', $options) ? ($options['import'] == true) : false;
     }
 
 
@@ -82,8 +83,13 @@ class GuzzleConsumer extends AbstractConsumer
     public function persist($batch)
     {
         if (count($batch) > 0) {
-            $url = $this->protocol . "://" . $this->host . $this->endpoint;
-            return $this->_execute($url, $batch);
+            if ($this->import) {
+                $url = $this->protocol . "://" . $this->host . $this->endpoint;
+                return $this->_execute($url, $batch);
+            } else {
+                $url = $this->protocol . "://" . $this->host . '/import';
+                return $this->executeImport($url, $batch);
+            }
         } else {
             return true;
         }
@@ -128,6 +134,45 @@ class GuzzleConsumer extends AbstractConsumer
                 $error = true;
             } else if ($response['value'] && trim($response['value']->getBody()->getContents()) != "1") {
                 $this->log("Error Code: " . $response['value']->getReasonPhrase() . "-Body:" . $response['value']->getBody()->getContents());
+                $error = true;
+            }
+        }
+        return !$error;
+    }
+
+    /**
+     * Write using the cURL php extension
+     * @param $url
+     * @param $batch
+     * @return bool
+     */
+    protected function executeImport($url, $batch)
+    {
+        if ($this->debug()) {
+            $this->log("Making blocking cURL call to $url");
+        }
+
+        $client = new Client([
+            'timeout' => $this->timeout, // Response timeout
+            'connect_timeout' => $this->connectTimeout, // Connection timeout
+            'http_errors' => config('mixpanel.ignore_http_errors')
+        ]);
+        $promises = [];
+        $batch_size = ceil(count($batch) / $this->getNumThreads());
+        for ($i = 0; $i < $this->getNumThreads() && !empty($batch); $i++) {
+            $promises[] = $client->postAsync($url, [
+                'json' => array_splice($batch, 0, $batch_size)
+            ]);
+        }
+        $responses = Utils::settle($promises)->wait();
+        $error = false;
+        /** @var Response */
+        foreach ($responses as $response) {
+            if ($response['value'] && $response['value']->getStatusCode() != Response::HTTP_OK) {
+                $this->log("Error: Code: " . $response['value']->getReasonPhrase() . "-Body:" . $response['value']->getBody()->getContents());
+                $error = true;
+            } else if (!$response) {
+                $this->log("Error: Body:" . $response['value']->getBody()->getContents());
                 $error = true;
             }
         }
