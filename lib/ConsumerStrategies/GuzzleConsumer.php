@@ -83,7 +83,8 @@ class GuzzleConsumer extends AbstractConsumer
         $this->fork = array_key_exists('fork', $options) ? ($options['fork'] == true) : false;
         $this->numThreads = array_key_exists('num_threads', $options) ? max(1, intval($options['num_threads'])) : 1;
         $this->import = array_key_exists('import', $options) ? ($options['import'] == true) : false;
-        $this->authorization_token = $options['authorization_token'];
+        $this->authorization_token = array_key_exists('authorization_token', $options) ? ($options['authorization_token']) : '';
+        $this->project_id = array_key_exists('project_id', $options) ? ($options['project_id']) : '';
     }
 
 
@@ -94,13 +95,17 @@ class GuzzleConsumer extends AbstractConsumer
      */
     public function persist($batch)
     {
+        $url = $this->protocol . "://" . $this->host . $this->endpoint;
         if (count($batch) > 0) {
-            if ($this->import) {
-                $url = $this->protocol . "://" . $this->host . $this->endpoint;
+            if (!$this->import) {
                 return $this->_execute($url, $batch);
             } else {
-                $url = $this->protocol . "://" . $this->host . '/import';
-                return $this->executeImport($url, $batch);
+                if ($this->endpoint == config('mixpanel.people_endpoint')) {
+                    return $this->_execute($url, $batch);
+                } else {
+                    $url = $this->protocol . "://" . $this->host . '/import?project_id=' . $this->project_id;
+                    return $this->executeImport($url, $batch);
+                }
             }
         } else {
             return true;
@@ -170,13 +175,13 @@ class GuzzleConsumer extends AbstractConsumer
             'http_errors' => config('mixpanel.ignore_http_errors')
         ]);
         $promises = [];
-        $batch_size = ceil(count($batch) / $this->getNumThreads());
-        for ($i = 0; $i < $this->getNumThreads() && !empty($batch); $i++) {
-            $promises[] = $client->postAsync($url, [
-                'json' => array_splice($batch, 0, $batch_size),
-                'Authorization' => 'Basic: ' . $this->authorization_token
-            ]);
-        }
+        $headers = [
+            'Authorization' => 'Basic ' . $this->authorization_token
+        ];
+        $promises[] = $client->postAsync($url, [
+            'json' => $batch,
+            'headers' => $headers
+        ]);
         $responses = Utils::settle($promises)->wait();
         $error = false;
         /** @var Response */
