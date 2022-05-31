@@ -56,6 +56,17 @@ class GuzzleConsumer extends AbstractConsumer
 
 
     /**
+     * @var string
+     */
+    protected $authorization_token;
+
+    /**
+     * @var string
+     */
+    protected $import;
+
+
+    /**
      * Creates a new CurlConsumer and assigns properties from the $options array
      * @param array $options
      * @throws Exception
@@ -72,6 +83,7 @@ class GuzzleConsumer extends AbstractConsumer
         $this->fork = array_key_exists('fork', $options) ? ($options['fork'] == true) : false;
         $this->numThreads = array_key_exists('num_threads', $options) ? max(1, intval($options['num_threads'])) : 1;
         $this->import = array_key_exists('import', $options) ? ($options['import'] == true) : false;
+        $this->authorization_token = $options['authorization_token'];
     }
 
 
@@ -161,7 +173,8 @@ class GuzzleConsumer extends AbstractConsumer
         $batch_size = ceil(count($batch) / $this->getNumThreads());
         for ($i = 0; $i < $this->getNumThreads() && !empty($batch); $i++) {
             $promises[] = $client->postAsync($url, [
-                'json' => array_splice($batch, 0, $batch_size)
+                'json' => array_splice($batch, 0, $batch_size),
+                'Authorization' => 'Basic: ' . $this->authorization_token
             ]);
         }
         $responses = Utils::settle($promises)->wait();
