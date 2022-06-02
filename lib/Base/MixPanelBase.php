@@ -4,6 +4,7 @@ namespace MixPanel\Base;
 
 use Carbon\Carbon;
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\FilterHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
@@ -55,7 +56,14 @@ class MixPanelBase
             $this->logger->pushHandler(
                 new StreamHandler(storage_path('logs/mixpanel-' . $date . '.log')),
                 Logger::DEBUG
-            );;
+            );
+
+            $this->logger->pushHandler(
+                new FilterHandler(
+                    new StreamHandler('php://stdout'),
+                    Logger::DEBUG
+                )
+            );
         }
         $this->options = $options;
     }
