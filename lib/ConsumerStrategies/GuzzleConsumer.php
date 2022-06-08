@@ -169,10 +169,11 @@ class GuzzleConsumer extends AbstractConsumer
             $this->log("Making blocking cURL call to $url");
         }
 
+        $isIgnoreError = config('mixpanel.ignore_http_errors');
         $client = new Client([
             'timeout' => $this->timeout, // Response timeout
             'connect_timeout' => $this->connectTimeout, // Connection timeout
-            'http_errors' => config('mixpanel.ignore_http_errors')
+            'http_errors' => $isIgnoreError
         ]);
         $promises = [];
         $headers = [
@@ -184,16 +185,31 @@ class GuzzleConsumer extends AbstractConsumer
         ]);
         $responses = Utils::settle($promises)->wait();
         $error = false;
-        /** @var Response */
-        foreach ($responses as $response) {
-            if ($response['value'] && $response['value']->getStatusCode() != Response::HTTP_OK) {
-                $this->log("Error: Code: " . $response['value']->getReasonPhrase() . "-Body:" . $response['value']->getBody()->getContents());
-                $error = true;
-            } else if (!$response) {
-                $this->log("Error: Body:" . $response['value']->getBody()->getContents());
-                $error = true;
+
+        if ($isIgnoreError) {
+            /** @var Response */
+            foreach ($responses as $response) {
+                if ($response['value'] && $response['value']->getStatusCode() != Response::HTTP_OK) {
+                    $this->log("Error: Code: " . $response['value']->getReasonPhrase() . "-Body:" . $response['value']->getBody()->getContents());
+                    $error = true;
+                } else if (!$response) {
+                    $this->log("Error: Body:" . $response['value']->getBody()->getContents());
+                    $error = true;
+                }
+            }
+        } else {
+            /** @var Response */
+            foreach ($responses as $response) {
+                if ($responses && $response->getStatusCode() != Response::HTTP_OK) {
+                    $this->log("Error: Code: " . $response->getReasonPhrase() . "-Body:" . $response->getBody()->getContents());
+                    $error = true;
+                } else if (!$response) {
+                    $this->log("Error: Body:" . $response->getBody()->getContents());
+                    $error = true;
+                }
             }
         }
+
         return !$error;
     }
 
