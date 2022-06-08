@@ -189,7 +189,7 @@ class GuzzleConsumer extends AbstractConsumer
         if ($isIgnoreError) {
             /** @var Response */
             foreach ($responses as $response) {
-                if ($response['value'] && $response['value']->getStatusCode() != Response::HTTP_OK) {
+                if ($responses && isset($responses['value']) && $response['value']->getStatusCode() != Response::HTTP_OK) {
                     $this->log("Error: Code: " . $response['value']->getReasonPhrase() . "-Body:" . $response['value']->getBody()->getContents());
                     $error = true;
                 } else if (!$response) {
@@ -200,11 +200,11 @@ class GuzzleConsumer extends AbstractConsumer
         } else {
             /** @var Response */
             foreach ($responses as $response) {
-                if ($responses && $response->getStatusCode() != Response::HTTP_OK) {
-                    $this->log("Error: Code: " . $response->getReasonPhrase() . "-Body:" . $response->getBody()->getContents());
+                if ($responses && isset($responses['value']) && $responses['value']->getStatusCode() != Response::HTTP_OK) {
+                    $this->log("Error: Code: " . $responses['value']->getReasonPhrase() . "-Body:" . $responses['value']->getBody()->getContents());
                     $error = true;
                 } else if (!$response) {
-                    $this->log("Error: Body:" . $response->getBody()->getContents());
+                    $this->log("Error: Body no response");
                     $error = true;
                 }
             }
