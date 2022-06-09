@@ -121,10 +121,7 @@ class GuzzleConsumer extends AbstractConsumer
      */
     protected function _execute($url, $batch)
     {
-        if ($this->debug()) {
-            $this->log("Making blocking cURL call to $url");
-        }
-
+        $this->log("Making forked cURL call to $url");
         $client = new Client([
             'timeout' => $this->timeout, // Response timeout
             'connect_timeout' => $this->connectTimeout, // Connection timeout
@@ -143,14 +140,29 @@ class GuzzleConsumer extends AbstractConsumer
         $error = false;
         /** @var Response */
         foreach ($responses as $response) {
-            if ($response['value'] && $response['value']->getStatusCode() != Response::HTTP_OK) {
-                $this->log("Error: Code: " . $response['value']->getReasonPhrase() . "-Body:" . $response['value']->getBody()->getContents());
-                $error = true;
-            } else if (!$response) {
-                $this->log("Error: Body:" . $response['value']->getBody()->getContents());
-                $error = true;
-            } else if ($response['value'] && trim($response['value']->getBody()->getContents()) != "1") {
-                $this->log("Error Code: " . $response['value']->getReasonPhrase() . "-Body:" . $response['value']->getBody()->getContents());
+            if ($response) {
+                if ($response && isset($response['value']) && $response['value']->getStatusCode() != Response::HTTP_OK) {
+                    $content = $response['value']->getBody()->getContents();
+                    $this->log("Guzzle consumer send request error", array_merge([
+                        'content' => $content,
+                        'body' => $batch
+                    ]), true);
+                    $error = true;
+                } else if ($response && isset($response['value'])) {
+                    $content = $response['value']->getBody()->getContents();
+                    $content = trim($content);
+                    if ($content !== "1") {
+                        $this->log("Guzzle consumer send request error", array_merge([
+                            'body' => $batch,
+                            'response' => $content,
+                        ]), true);
+                        $error = true;
+                    }
+                }
+            } else {
+                $this->log("Guzzle consumer send request error", array_merge([
+                    'body' => $batch,
+                ]), true);
                 $error = true;
             }
         }
@@ -165,14 +177,11 @@ class GuzzleConsumer extends AbstractConsumer
      */
     protected function executeImport($url, $batch)
     {
-        if ($this->debug()) {
-            $this->log("Making blocking cURL call to $url");
-        }
-
+        $this->log("Making blocking cURL call to $url");
         $isIgnoreError = config('mixpanel.ignore_http_errors');
         $client = new Client([
-            'timeout' => $this->timeout, // Response timeout
-            'connect_timeout' => $this->connectTimeout, // Connection timeout
+            'timeout' => $this->timeout,
+            'connect_timeout' => $this->connectTimeout,
             'http_errors' => $isIgnoreError
         ]);
         $promises = [];
@@ -186,27 +195,32 @@ class GuzzleConsumer extends AbstractConsumer
         $responses = Utils::settle($promises)->wait();
         $error = false;
 
-        if ($isIgnoreError) {
-            /** @var Response */
-            foreach ($responses as $response) {
-                if ($responses && isset($responses['value']) && $response['value']->getStatusCode() != Response::HTTP_OK) {
-                    $this->log("Error: Code: " . $response['value']->getReasonPhrase() . "-Body:" . $response['value']->getBody()->getContents());
+        /** @var Response */
+        foreach ($responses as $response) {
+            if ($response) {
+                if ($response && isset($response['value']) && $response['value']->getStatusCode() != Response::HTTP_OK) {
+                    $content = $response['value']->getBody()->getContents();
+                    $this->log("Guzzle consumer import send request error", array_merge([
+                        'content' => $content,
+                        'body' => $batch
+                    ]), true);
                     $error = true;
-                } else if (!$response) {
-                    $this->log("Error: Body:" . $response['value']->getBody()->getContents());
-                    $error = true;
+                } else if ($response && isset($response['value'])) {
+                    $content = $response['value']->getBody()->getContents();
+                    $content = trim($content);
+                    if ($content !== "1") {
+                        $this->log("Guzzle consumer import send request error", array_merge([
+                            'body' => $batch,
+                            'response' => $content,
+                        ]), true);
+                        $error = true;
+                    }
                 }
-            }
-        } else {
-            /** @var Response */
-            foreach ($responses as $response) {
-                if ($responses && isset($responses['value']) && $responses['value']->getStatusCode() != Response::HTTP_OK) {
-                    $this->log("Error: Code: " . $responses['value']->getReasonPhrase() . "-Body:" . $responses['value']->getBody()->getContents());
-                    $error = true;
-                } else if (!$response) {
-                    $this->log("Error: Body no response");
-                    $error = true;
-                }
+            } else {
+                $this->log("Guzzle consumer import send request error", array_merge([
+                    'body' => $batch,
+                ]), true);
+                $error = true;
             }
         }
 
@@ -222,7 +236,6 @@ class GuzzleConsumer extends AbstractConsumer
      */
     protected function _execute_forked($url, $data)
     {
-
         if ($this->debug()) {
             $this->log("Making forked cURL call to $url");
         }

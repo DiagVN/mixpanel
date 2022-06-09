@@ -52,16 +52,18 @@ class MixPanelBase
         $options = array_merge($this->defaults, $options);
         if (!$logger) {
             $date = Carbon::now()->format('Y-m-d');
-            $this->logger = new Logger('MixPanel');
+            $this->logger = new Logger(strtoupper(app()->environment()) . '.MixPanel');
             $this->logger->pushHandler(
                 new StreamHandler(storage_path('logs/mixpanel-' . $date . '.log')),
-                Logger::DEBUG
+                Logger::DEBUG,
+                Logger::ERROR
             );
 
             $this->logger->pushHandler(
                 new FilterHandler(
                     new StreamHandler('php://stdout'),
-                    Logger::DEBUG
+                    Logger::DEBUG,
+                    Logger::ERROR
                 )
             );
         }
@@ -73,12 +75,16 @@ class MixPanelBase
      * Log a message to PHP's error log
      * @param $msg
      */
-    protected function log($msg)
+    protected function log($msg, $data = [], $isError = false)
     {
         $arr = debug_backtrace();
         $class = $arr[0]['class'];
         $line = $arr[0]['line'];
-        $this->logger->debug("[ $class - line $line ] : " . $msg);
+        if (!$isError) {
+            $this->logger->debug("[ $class - line $line ] : " . $msg, $data);
+        } else {
+            $this->logger->error("[ $class - line $line ] : " . $msg, $data);
+        }
     }
 
 

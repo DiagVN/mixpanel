@@ -74,10 +74,6 @@ abstract class MixPanelBaseProducer extends MixPanelBase
         // associate token
         $this->token = $token;
 
-        if ($this->debug()) {
-            $this->log("Using token: " . $this->token);
-        }
-
         // instantiate the chosen consumer
         $this->consumer = $this->getConsumer();
     }
@@ -92,9 +88,6 @@ abstract class MixPanelBaseProducer extends MixPanelBase
         $max_attempts = 10;
         $success = false;
         while (!$success && $attempts < $max_attempts) {
-            if ($this->debug()) {
-                $this->log("destruct flush attempt #" . ($attempts + 1));
-            }
             $success = $this->flush();
             $attempts++;
         }
@@ -111,32 +104,11 @@ abstract class MixPanelBaseProducer extends MixPanelBase
         $queue_size = count($this->queue);
         $succeeded = true;
         $numThreads = $this->consumer->getNumThreads();
-
-        if ($this->debug()) {
-            $this->log("Flush called - queue size: " . $queue_size);
-        }
-
         while ($queue_size > 0 && $succeeded) {
             $batch_size = min(array($queue_size, $desiredBatchSize * $numThreads, $this->options['max_batch_size'] * $numThreads));
             $batch = array_splice($this->queue, 0, $batch_size);
             $succeeded = $this->_persist($batch);
-
-            if (!$succeeded) {
-                if ($this->debug()) {
-                    $this->log("Batch consumption failed!");
-                }
-                $this->queue = array_merge($batch, $this->queue);
-
-                if ($this->debug()) {
-                    $this->log("added batch back to queue, queue size is now $queue_size");
-                }
-            }
-
             $queue_size = count($this->queue);
-
-            if ($this->debug()) {
-                $this->log("Batch of $batch_size consumed, queue size is now $queue_size");
-            }
         }
         return $succeeded;
     }
@@ -178,9 +150,6 @@ abstract class MixPanelBaseProducer extends MixPanelBase
     {
         $key = $this->options['consumer'];
         $Strategy = $this->consumers[$key];
-        if ($this->debug()) {
-            $this->log("Using consumer: " . $key . " -> " . $Strategy);
-        }
         $this->options['endpoint'] = $this->getEndpoint();
 
         return new $Strategy($this->options);
@@ -197,10 +166,6 @@ abstract class MixPanelBaseProducer extends MixPanelBase
         // force a flush if we've reached our threshold
         if (count($this->queue) >= $this->maxQueueSize) {
             $this->flush();
-        }
-
-        if ($this->debug()) {
-            $this->log("Queued message: " . json_encode($message));
         }
     }
 
