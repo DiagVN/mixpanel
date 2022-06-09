@@ -121,7 +121,9 @@ class GuzzleConsumer extends AbstractConsumer
      */
     protected function _execute($url, $batch)
     {
-        $this->log("Making forked cURL call to $url");
+        $this->log("Making cURL call to $url", [
+            'data' => $batch,
+        ]);
         $client = new Client([
             'timeout' => $this->timeout, // Response timeout
             'connect_timeout' => $this->connectTimeout, // Connection timeout
@@ -177,7 +179,9 @@ class GuzzleConsumer extends AbstractConsumer
      */
     protected function executeImport($url, $batch)
     {
-        $this->log("Making blocking cURL call to $url");
+        $this->log("Making cURL call to $url", [
+            'data' => $batch,
+        ]);
         $isIgnoreError = config('mixpanel.ignore_http_errors');
         $client = new Client([
             'timeout' => $this->timeout,
