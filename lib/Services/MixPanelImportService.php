@@ -27,7 +27,14 @@ class MixPanelImportService extends MixPanelBase
 
         $content = $response->getBody()->getContents();
         if (trim($content) != "1") {
-            Log::error('Bulk import mixpanel error');
+            $this->log("Guzzle consumer import send request error", [
+                'body' => $data,
+                'content' => $content
+            ], true);
+        } else {
+            $this->log("Guzzle consumer import send request success", [
+                'body' => $data,
+            ]);
         }
 
         return $content;
